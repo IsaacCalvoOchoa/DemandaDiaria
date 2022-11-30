@@ -1,0 +1,18 @@
+﻿@model DemandaDiaria.Data.Entities.Sucursal
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Eliminar</h1>
+
+<h3>Esta seguro de eliminar la Sucursal?</h3>
+<div>
+    <partial name="_SucursalDetails" />
+    
+    <form asp-action="DeleteSucursal">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" asp-route-id="@Model.Plaza.Id" value="Eliminar" class="btn btn-outline-danger" />
+        <a asp-action="Details" asp-route-id="@Model.Plaza.Id" class="btn btn-outline-success">Regresar</a>
+    </form>
+</div>

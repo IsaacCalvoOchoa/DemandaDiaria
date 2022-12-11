@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace DemandaDiaria.Data.Entities
 {
@@ -13,6 +15,7 @@ namespace DemandaDiaria.Data.Entities
         [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "El campo {0} es obligatorio.")]
         public string Name { get; set; }
 
+        [System.Text.Json.Serialization.JsonIgnore]
         public Plaza Plaza { get; set; }
 
         public ICollection<User> Users { get; set; }

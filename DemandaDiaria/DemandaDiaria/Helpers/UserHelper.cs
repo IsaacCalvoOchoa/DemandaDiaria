@@ -25,6 +25,31 @@ namespace DemandaDiaria.Helpers
             return await _userManager.CreateAsync(user, password);
         }
 
+        public async Task<User> AddUserAsync(AddUserViewModel model)
+        {
+            User user = new User
+            {
+                Uni = model.Uni,
+                Email = model.Username,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Sucursal = await _context.Sucursales.FindAsync(model.SucursalId),
+                UserName = model.Username,
+                UserType = model.UserType,
+            };
+
+            IdentityResult result = await _userManager.CreateAsync(user, model.Password);
+            if (result != IdentityResult.Success)
+            {
+                return null;
+            }
+
+            User newUser = await GetUserAsync(model.Username);
+            await AddUserToRoleAsync(newUser, user.UserType.ToString());
+            return newUser;
+
+        }
+
         public async Task AddUserToRoleAsync(User user, string roleName)
         {
             await _userManager.AddToRoleAsync(user, roleName);
@@ -43,11 +68,11 @@ namespace DemandaDiaria.Helpers
 
         }
 
-        public async Task<User> GetUserAsync(string uni)
+        public async Task<User> GetUserAsync(string email)
         {
             return await _context.Users
             .Include(u => u.Sucursal)
-            .FirstOrDefaultAsync(u => u.Uni == uni);
+            .FirstOrDefaultAsync(u => u.Email == email);
 
         }
 

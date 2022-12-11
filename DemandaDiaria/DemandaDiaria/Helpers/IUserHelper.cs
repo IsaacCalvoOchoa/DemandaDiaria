@@ -6,9 +6,11 @@ namespace DemandaDiaria.Helpers
 {
     public interface IUserHelper
     {
-        Task<User> GetUserAsync(string Uni);
+        Task<User> GetUserAsync(string email);
 
         Task<IdentityResult> AddUserAsync(User user, string password);
+
+        Task<User> AddUserAsync(AddUserViewModel model);
 
         Task CheckRoleAsync(string roleName);
 

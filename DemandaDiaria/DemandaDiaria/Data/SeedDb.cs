@@ -19,13 +19,88 @@ namespace DemandaDiaria.Data
         public async Task SeedAsync()
         {
             await _context.Database.EnsureCreatedAsync();
+            //await CheckSucursalesAsync();
+            await CheckPlazasAsync();
             await CheckRolesAsync();
-            //await CheckUserAsync("00106968", "Isaac", "Calvo", UserType.Admin, string.empty);
+            await CheckUserAsync("00106968", "Isaac", "Calvo", "isaaccalvoochoa@gmail.com", UserType.Admin);
         }
 
-        private Task CheckUserAsync(string v1, string v2, string v3, UserType admin)
+        private async Task<User> CheckUserAsync(
+    string uni,
+    string firstName,
+    string lastName,
+    string email,
+    UserType userType)
         {
-            throw new NotImplementedException();
+            User user = await _userHelper.GetUserAsync(email);
+            if (user == null)
+            {
+                user = new User
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Email = email,
+                    UserName = email,
+                    Uni = uni,
+                    Sucursal = _context.Sucursales.FirstOrDefault(),
+                    UserType = userType,
+                };
+
+                await _userHelper.AddUserAsync(user, "00106968");
+                await _userHelper.AddUserToRoleAsync(user, userType.ToString());
+            }
+
+            return user;
+        }
+
+        private async Task CheckRolesAsync()
+        {
+            await _userHelper.CheckRoleAsync(UserType.Admin.ToString());
+            await _userHelper.CheckRoleAsync(UserType.Roc.ToString());
+            await _userHelper.CheckRoleAsync(UserType.Rf.ToString());
+            await _userHelper.CheckRoleAsync(UserType.Adi.ToString());
+        }
+
+
+        private async Task CheckPlazasAsync()
+        {
+            if (!_context.Plazas.Any())
+            {
+                _context.Plazas.Add(new Plaza
+                {
+                    Name = "Mexicali",
+                    Sucursales = new List<Sucursal>()
+                    {
+                        new Sucursal { Name = "Anahuac" },
+                        new Sucursal { Name = "Xochimilco" },
+                        new Sucursal { Name = "Madero B" },
+                    },
+                });
+                _context.Plazas.Add(new Plaza
+                {
+                    Name = "Tijuana",
+                    Sucursales = new List<Sucursal>()
+                    {
+                        new Sucursal { Name = "Gobernador Lugo" },
+                        new Sucursal { Name = "Ermita" },
+                        new Sucursal { Name = "Castro" },
+                    },
+                });
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task CheckSucursalesAsync()
+        {
+            if (!_context.Sucursales.Any())
+            {
+                _context.Sucursales.Add(new Sucursal { Name = "Anahuac" });
+                _context.Sucursales.Add(new Sucursal { Name = "Xochimilco" });
+                _context.Sucursales.Add(new Sucursal { Name = "Madero B" });
+                _context.Sucursales.Add(new Sucursal { Name = "Galerias" });
+                await _context.SaveChangesAsync();
+            }
         }
 
         private async Task<User> CheckUserAsync(string uni, string firstName, string lastName, UserType userType, Sucursal sucursal)
@@ -50,13 +125,13 @@ namespace DemandaDiaria.Data
 
         }
 
-        private async Task CheckRolesAsync()
-        {
-            await _userHelper.CheckRoleAsync(UserType.Admin.ToString());
-            await _userHelper.CheckRoleAsync(UserType.Roc.ToString());
-            await _userHelper.CheckRoleAsync(UserType.Rf.ToString());
-            await _userHelper.CheckRoleAsync(UserType.Adi.ToString());
-        }
+        //private async Task CheckRolesAsync()
+        //{
+        //    await _userHelper.CheckRoleAsync(UserType.Admin.ToString());
+        //    await _userHelper.CheckRoleAsync(UserType.Roc.ToString());
+        //    await _userHelper.CheckRoleAsync(UserType.Rf.ToString());
+        //    await _userHelper.CheckRoleAsync(UserType.Adi.ToString());
+        //}
 
     }
 }

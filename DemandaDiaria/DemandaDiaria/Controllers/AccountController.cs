@@ -3,7 +3,9 @@ using DemandaDiaria.Data.Entities;
 using DemandaDiaria.Eums;
 using DemandaDiaria.Helpers;
 using DemandaDiaria.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using System.Diagnostics.Metrics;
@@ -116,7 +118,91 @@ namespace DemandaDiaria.Controllers
             }
 
             return Json(plaza.Sucursales.OrderBy(d => d.Name));
-        }        
+        }
+
+        public async Task<IActionResult> ChangeUser()
+        {
+            User user = await _userHelper.GetUserAsync(User.Identity.Name);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            EditUserViewModel model = new()
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Sucursales = await _comboshelper.GetComboSucursalesAsync(user.Sucursal.Plaza.Id),
+                SucursalId = user.Sucursal.Id,
+                Plazas = await _comboshelper.GetComboPlazasAsync(),
+                PlazaId = user.Sucursal.Plaza.Id,
+                Id = user.Id,
+                Uni = user.Uni
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangeUser(EditUserViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                User user = await _userHelper.GetUserAsync(User.Identity.Name);
+
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+                user.Sucursal = await _context.Sucursales.FindAsync(model.SucursalId);
+                user.Uni = model.Uni;
+
+                await _userHelper.UpdateUserAsync(user);
+                return RedirectToAction("Index", "Home");
+            }
+
+            model.Plazas = await _comboshelper.GetComboPlazasAsync();
+            model.Sucursales = await _comboshelper.GetComboSucursalesAsync(model.PlazaId);
+            return View(model);
+        }
+
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                if (model.OldPassword == model.NewPassword)
+                {
+                    ModelState.AddModelError(string.Empty, "Debes ingresar una contrasena diferente");
+                    return View(model);
+                }
+
+                User? user = await _userHelper.GetUserAsync(User.Identity.Name);
+                if (user != null)
+                {
+                    IdentityResult? result = await _userHelper.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+                    if (result.Succeeded)
+                    {
+                        return RedirectToAction("ChangeUser");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, result.Errors.FirstOrDefault().Description);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Usuario no encontrado.");
+                }
+            }
+
+            return View(model);
+        }
+
 
     }
 }

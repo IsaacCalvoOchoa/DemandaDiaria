@@ -1,0 +1,38 @@
+﻿@model DemandaDiaria.Models.EditUserViewModel
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label asp-for="Uni" class="control-label"></label>
+            <input asp-for="Uni" class="form-control" />
+            <span asp-validation-for="Uni" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="FirstName" class="control-label"></label>
+            <input asp-for="FirstName" class="form-control" />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="LastName" class="control-label"></label>
+            <input asp-for="LastName" class="form-control" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>       
+    </div>
+    <div class="col-md-6">
+       
+        <div class="form-group">
+            <label asp-for="PlazaId" class="control-label"></label>
+            <select asp-for="PlazaId" asp-items="Model.Plazas" class="form-control"></select>
+            <span asp-validation-for="PlazaId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="SucursalId" class="control-label"></label>
+            <select asp-for="SucursalId" asp-items="Model.Sucursales" class="form-control"></select>
+            <span asp-validation-for="SucursalId" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+

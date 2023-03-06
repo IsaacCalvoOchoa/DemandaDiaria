@@ -1,0 +1,58 @@
+﻿@model DemandaDiaria.Models.EditUserViewModel
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Editar</h2>
+
+<h4>Usuario</h4>
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="ChangeUser" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="Plazas" />
+            <input type="hidden" asp-for="Sucursales" />
+
+            <partial name="_User" />
+
+            <div class="form-group mt-2">
+                <input type="submit" value="Guardar" class="btn btn-outline-primary" />
+                <a asp-action="ChangePassword" class="btn btn-outline-primary">Cambiar Contraseña</a>
+            </div>
+        </form>
+    </div>    
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#PlazaId").change(function () {
+                $("#SucursalId").empty();
+                $("#SucursalId").append('<option value="0">[Selecciona una Sucursal...]</option>');
+                debugger;
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("GetSucursales")',
+                    dataType: 'json',
+                    data: { plazaId: $("#PlazaId").val() },
+                    success: function (sucursales) {
+                        $.each(sucursales, function (i, sucursal) {
+                            $("#SucursalId").append('<option value="'
+                                + sucursal.id + '">'
+                                + sucursal.name + '</option>');
+                        });
+                    },
+                    error: function (ex) {
+                        alert('Failed to retrieve sucursales.' + ex);
+                    }
+                });
+                return false;
+            })
+        });
+    </script>
+}
+
+

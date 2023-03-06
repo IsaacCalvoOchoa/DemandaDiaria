@@ -1,0 +1,28 @@
+﻿@model DemandaDiaria.Data.Entities.Sucursal
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Delete</h1>
+
+<h3>Estas seguro de eliminar esta Sucursal?</h3>
+<div>
+    <h4>Sucursal</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+    </dl>
+
+    <form asp-action="DeleteSucursal">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-outline-danger" /> |
+        <a asp-action="Details" asp-route-id="@Model.Plaza.Id" class="btn btn-outline-primary">Regresar</a>
+    </form>
+</div>
+
